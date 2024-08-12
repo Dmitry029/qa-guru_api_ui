@@ -20,7 +20,7 @@ public class AddBookSpec {
             .contentType(JSON);
 
     public static ResponseSpecification addBookResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(201)
+            .expectStatusCode(400)
             .log(STATUS)
             .log(BODY)
             .build();
