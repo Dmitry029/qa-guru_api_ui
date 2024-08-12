@@ -1,37 +1,49 @@
 package tests;
 
-import com.codeborne.selenide.Condition;
+import authorization.AuthorizationApi;
+import helpers.WithLogin;
 import io.restassured.response.Response;
-import models.AuthModel;
+import models.BookDataModel;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Cookie;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
-import static specs.DeleteBookSpec.loginRequestSpec;
-import static specs.DeleteBookSpec.loginResponseSpec;
+import static specs.AddBookSpec.addBookRequestSpec;
+import static specs.AddBookSpec.addBookResponseSpec;
+import static specs.DeleteAllBooksSpec.deleteAllBooksRequestSpec;
+import static specs.DeleteAllBooksSpec.deleteAllBooksResponseSpec;
 
 public class DeleteBookTest extends BaseTest {
 
+    private final Response authResponse = new AuthorizationApi().getAuthorizationResponse();
+
+    @WithLogin
     @Test
     void deleteBookTest() {
-        AuthModel model = new AuthModel(getUserName(), getPassword());
-        Response authResponse = given(loginRequestSpec)
-                .body(model)
+
+        //*****************************************************************************************
+        given(deleteAllBooksRequestSpec)
+                .header("Authorization", "Bearer " + authResponse.path("token"))
+                .queryParams("UserId", authResponse.path("userId"))
                 .when()
-                .post("Account/v1/Login")
+                .delete("BookStore/v1/Books")
                 .then()
-                .spec(loginResponseSpec)
+                .spec(deleteAllBooksResponseSpec)
                 .extract().response();
 
-        open("/favicon.ico");
-        getWebDriver().manage().addCookie(new Cookie("userID", authResponse.path("userId")));
-        getWebDriver().manage().addCookie(new Cookie("expires", authResponse.path("expires")));
-        getWebDriver().manage().addCookie(new Cookie("token", authResponse.path("token")));
+//******************************************************************************************
+        String isbn = "9781449325862";
+        List<String> books = List.of(isbn);
+        BookDataModel bookData = new BookDataModel(authResponse.path("userId"), books);
 
-        open("/profile");
-        $("#userName-value").should(Condition.text(getUserName()));
+        Response addBookResponse = given(addBookRequestSpec)
+                .header("Authorization", "Bearer " + authResponse.path("token"))
+                .body(bookData)
+                .when()
+                .post("BookStore/v1/Books")
+                .then()
+                .spec(addBookResponseSpec)
+                .extract().response();
     }
 }

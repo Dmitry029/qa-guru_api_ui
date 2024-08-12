@@ -6,23 +6,18 @@ import io.restassured.specification.ResponseSpecification;
 
 import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.restassured.RestAssured.with;
-import static io.restassured.filter.log.LogDetail.BODY;
 import static io.restassured.filter.log.LogDetail.STATUS;
 import static io.restassured.http.ContentType.JSON;
 
-public class DeleteBookSpec {
-
-    public static RequestSpecification loginRequestSpec = with()
+public class DeleteAllBooksSpec {
+    public static RequestSpecification deleteAllBooksRequestSpec = with()
             .filter(withCustomTemplates())
             .log().uri()
             .log().method()
-            .log().body()
             .log().headers()
             .contentType(JSON);
-
-    public static ResponseSpecification loginResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(200)
+    public static ResponseSpecification deleteAllBooksResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(204)
             .log(STATUS)
-            .log(BODY)
             .build();
 }
