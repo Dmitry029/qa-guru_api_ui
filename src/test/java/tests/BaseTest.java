@@ -17,8 +17,8 @@ import static com.codeborne.selenide.Selenide.closeWebDriver;
 
 @Data
 public class BaseTest {
-    private String userName = "TestUserName";
-    private String password = "TestUserNameKdp110$";
+    private String userName = "test12345";
+    private String password = "Test12345$";
 
     @BeforeAll
     static void setup() {
